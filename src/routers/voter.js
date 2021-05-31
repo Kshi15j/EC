@@ -8,7 +8,7 @@ const Sportsec = require('../models/sportsec')
 const Secretary = require('../models/secretary')
 const JSecretary = require('../models/jsecretary')
 const Treasurer = require('../models/treasurer')
-const VoterMaster = require('../models/voterMaster')
+const techSecretary = require('../models/techsecretary')
 const auth = require('../middleware/voter')
 
 router.use('/', express.static(path.join(__dirname, '..', 'static', 'vote')));
@@ -29,6 +29,10 @@ router.get('/girls', (req, res) => {
 
 router.get('/club', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'static', 'vote', 'ballot_club.html'))
+})
+
+router.get('/techsec', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'static', 'vote', 'ballot_tech.html'))
 })
 
 
@@ -55,10 +59,6 @@ router.post('/boys', auth, async (req, res) => {
         await gensec.save()
         await cultsec.save()
         await sportsec.save()
-
-        const voterMaster = await VoterMaster.findOne({username: req.body.username})
-        voterMaster.voted = true
-        await voterMaster.save()
 
         res.status(200).send({
             "text": "Thank You for Voting."
@@ -93,10 +93,6 @@ router.post('/girls', auth, async (req, res) => {
         await cultsec.save()
         await sportsec.save()
 
-        const voterMaster = await VoterMaster.findOne({username: req.body.username})
-        voterMaster.voted = true
-        await voterMaster.save()
-
         res.status(200).send({
             "text": "Thank You for Voting."
         })
@@ -128,10 +124,27 @@ router.post('/club', auth, async (req, res) => {
             await treasurer.save()
         }
 
-        const voterMaster = await VoterMaster.findOne({username: req.body.username})
-        voterMaster.voted = true
-        await voterMaster.save()
+        res.status(200).send({
+            "text": "Thank You for Voting."
+        })
+    } catch (e) {
+        // console.log(e)
+        res.status(400).send({
+            "text": "Internal Server Error."
+        })
+    }
+})
+
+router.post('/techsec', auth, async (req, res) => {
+    try {
+        if (req.body.techsecretary) {
+            const secretary = await Secretary.findOne({name: req.body.secretary})
+            secretary.votes += 1
+            await secretary.save()
+        }
+
         
+
         res.status(200).send({
             "text": "Thank You for Voting."
         })

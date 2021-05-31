@@ -9,47 +9,29 @@ const Cultsec = require('../models/cultsec')
 const Sportsec = require('../models/sportsec')
 const Secretary = require('../models/secretary')
 const JSecretary = require('../models/jsecretary')
+const techSecretary = require('../models/techsecretary')
 const Treasurer = require('../models/treasurer')
+const techSecretary = require('../models/techsecretary')
 const generator = require('generate-password')
 const auth = require('../middleware/admin')
 const nodemailer = require('nodemailer')
 
 // 0. create admin
-// router.post('/addAdmin', auth, async (req, res) => {
-//     const admin = new Admin(req.body)
-//     try {
-//         await admin.save()
-//         res.send({admin: admin.getPublicProfile()})
-//     } catch (error) {
-//         res.status(400).send(error)
-//     }
-// })
+router.post('/addAdmin', auth, async (req, res) => {
+    const admin = new Admin(req.body)
+    try {
+        await admin.save()
+        res.send({admin: admin.getPublicProfile()})
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
 
 // 1. login admin
 router.post('/login', async (req, res) => {
     try {
         const admin = await Admin.findByCredentials(req.body.username, req.body.password)
         const token = await admin.generateAuthToken()
-
-        try {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                  user: process.env.GMAIL_ID,
-                  pass: process.env.GMAIL_PASSWORD
-                }
-            })
-            const mailOptions = {
-                from: process.env.GMAIL_ID,
-                to: process.env.GMAIL_ID,
-                subject: 'Administrator Login Notification',
-                text: 'New Admin login detected. Use /admin/logoutAll route to revoke all admin access. Use /admin/update to upate admin password.' 
-            }
-            transporter.sendMail(mailOptions)
-        } catch (error) {
-            throw new Error(error)
-        }
-
         res.send({admin: admin.getPublicProfile(), token: token})
     } catch (error) {
         res.status(400).send(error)
@@ -265,6 +247,19 @@ router.post('/addTreasurer', auth, async (req, res) => {
     }
 })
 
+// 16. add techsecretary candidate
+router.post('/addtechSecretary', auth, async (req, res) => {
+    const candidate = new techSecretary(req.body)
+    try {
+        await candidate.save()
+        res.status(201).send()
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+
+
 // 19. get results
 router.get('/results', auth, async (req, res) => {
     try {
@@ -275,6 +270,7 @@ router.get('/results', auth, async (req, res) => {
         const secretary = await Secretary.find({})
         const jsecretary = await JSecretary.find({})
         const treasurer = await Treasurer.find({})
+        const techsecretary = await techSecretary.find({})
 
         res.status(200).send({
             president,
@@ -283,7 +279,8 @@ router.get('/results', auth, async (req, res) => {
             sportsec,
             secretary,
             jsecretary,
-            treasurer
+            treasurer,
+            techsecretary
         })
     } catch (error) {
         res.status(400).send()
