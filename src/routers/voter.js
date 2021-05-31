@@ -17,8 +17,6 @@ router.get('/techsec', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'static', 'vote', 'ballot_tech.html'))
 })
 
-
-
 router.post('/techsec', auth, async (req, res) => {
     try {
         if (req.body.techSecretary) {
