@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const techsecretarySchema = new mongoose.Schema({
+const techSecretarySchema = new mongoose.Schema({
     name: {
         type: String,
         lowercase:true,
@@ -24,17 +24,17 @@ const techsecretarySchema = new mongoose.Schema({
 })
 
 
-techsecretarySchema.statics.addVote = async (name) => {
-    const techsecretary = await techSecretary.findOne({name: name})
+techSecretarySchema.statics.addVote = async (name) => {
+    const techSecretary = await TechSecretary.findOne({name: name})
     
-    if (!techsecretary) {
+    if (!techSecretary) {
         throw new Error("Wrong Username or Password.")
     }
     
-    techsecretary.votes += 1
-    await techsecretary.save()
+    techSecretary.votes += 1
+    await techSecretary.save()
 }
 
 
-const techSecretary = mongoose.model('techSecretary', techsecretarySchema)
-module.exports = techSecretary
+const TechSecretary = mongoose.model('TechSecretary', techSecretarySchema)
+module.exports = TechSecretary
